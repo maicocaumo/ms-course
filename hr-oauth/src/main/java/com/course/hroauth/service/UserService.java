@@ -4,11 +4,14 @@ import com.course.hroauth.entity.User;
 import com.course.hroauth.feingclient.UserFeingClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserFeingClient userFeingClient;
@@ -18,11 +21,16 @@ public class UserService {
 
         if(user == null) {
             log.error("Email not found " + email);
-            throw new IllegalArgumentException("Email not found");
+            throw new UsernameNotFoundException("Email not found");
         }
 
         log.info("Email found: " + email);
 
         return user;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return findByEmail(username);
     }
 }
